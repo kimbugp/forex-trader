@@ -1,5 +1,0 @@
-{
-    "python.pythonPath": "/anaconda3/envs/forex-trader/bin/python",
-    "python.linting.pep8Enabled": true,
-    "python.linting.enabled": true
-}
