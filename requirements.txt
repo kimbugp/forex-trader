@@ -6,3 +6,4 @@ jupyter=1.0.0=py37_7
 numpy=1.16.4=py37hacdab7b_0
 pep8=1.7.1=py37_0
 quandl=3.4.6=y37_0
+matplotlib=3.0.2=py37h54f8f79_0

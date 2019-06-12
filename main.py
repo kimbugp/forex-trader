@@ -1,7 +1,14 @@
-from data_retrieve import QUANDLDATA
+# %%
+from data_plotter import Plot
+import matplotlib.animation as animation
+import matplotlib.pyplot as plt
 
 
 if __name__ == "__main__":
-    q = QUANDLDATA()
-    data = q.get_data()
-    print(data)
+    fig = plt.figure()
+    graph = Plot(fig)
+    plot = graph.plot()
+    plot.show()
+
+
+# %%
