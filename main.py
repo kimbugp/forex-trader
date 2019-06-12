@@ -1,7 +1,6 @@
-from data_retrieve import QUANDLDATA
-
+from data_plotter import Plot
 
 if __name__ == "__main__":
-    q = QUANDLDATA()
-    data = q.get_data()
-    print(data)
+    graph = Plot()
+    graph.plot()
+
