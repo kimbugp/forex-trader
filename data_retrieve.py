@@ -12,16 +12,19 @@ start_date = today - timedelta(days=1)
 
 class QUANDLDATA(object):
     data = []
-    currency_pair = "WIKI/FB"
+    currency_pair = "FB"
+    source = "WIKI"
     end_date = today.strftime("%Y-%m-%d")
     start_date = start_date.strftime("%Y-%m-%d")
-    url = 'https://www.quandl.com/api/v3/datasets/{0}/{1}?'
+    url = 'https://www.quandl.com/api/v3/datasets/{0}/{1}/{2}?'
     api_key = os.environ.get("QUANDL_API_KEY")
     return_format = 'data.json'
 
     def __init__(self, *args, **kwargs):
-        if kwargs.get('currency_pair') is not None:
+        if kwargs.pop('currency_pair', None) is not None:
             self.currency_pair = kwargs.get('currency_pair')
+        if kwargs.pop('source', None) is not None:
+            self.source = kwargs.get('source')
 
     def date_range(self, start_date, end_date):
         if start_date is not None:
@@ -30,7 +33,8 @@ class QUANDLDATA(object):
             self.end_date = end_date.strftime("%Y-%m-%d")
         return self.start_date, self.end_date
 
-    def get_data(self, start_date=None, end_date=None, **kwargs):
+    def get_data(self, start_date=None, end_date=None,
+                 currency_pair=None, source=None, **kwargs):
         """Get sample data
 
         Args:
@@ -40,13 +44,19 @@ class QUANDLDATA(object):
         Returns:
             data
         """
+        self.currency_pair = currency_pair if currency_pair else self.currency_pair  # noqa
+        self.source = source if source else self.source
         start, end = self.date_range(start_date, end_date)
+
         url = self.url_parse(start_date=self.start_date,
                              end_date=self.end_date, **kwargs)
-        data = q.get(url, {'API_KEY': self.api_key}).json()
-        self.data = data
-        self.has_been_called = True
-        return self.data
+        
+        data = q.get(url, {'API_KEY': self.api_key})
+        if data:
+            self.data = data.json()
+            self.has_been_called = True
+            return self.data
+        raise Exception(data.json())
 
     def get_metadata(self):
         assert self.has_been_called == True, "call get data"  # noqa
@@ -55,5 +65,6 @@ class QUANDLDATA(object):
 
     def url_parse(self, **kwargs):
         params = urlencode(kwargs)
-        url = self.url.format(self.currency_pair, self.return_format) + params
+        url = self.url.format(
+            self.source, self.currency_pair, self.return_format) + params
         return url
