@@ -24,7 +24,7 @@ class Plot(object):
 
     def plot(self):
         q = QUANDLDATA()
-        self.data = q.get_data(**self.__dict__, collapse='daily',)
+        self.data = q.get_data(**self.__dict__, collapse='daily')
         clean_data = self.__clean_data(self.data)
         ma = clean_data.close.rolling(center=False, window=30).mean()
 
