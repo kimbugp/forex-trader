@@ -1,13 +1,17 @@
 import pandas as pd
+
 import plotly as plt
 import plotly.graph_objs as go
-from plotly import tools
-
 from data_retrieve import QUANDLDATA
+from plotly import tools
 
 
 class Plot(object):
-    data = []
+
+    def __init__(self, *args, **kwargs):
+        for key, value in kwargs.items():
+            if value is not None:
+                setattr(self, key, value)
 
     def __clean_data(self, request):
         data = request.get("dataset_data").get("data")
@@ -20,15 +24,15 @@ class Plot(object):
 
     def plot(self):
         q = QUANDLDATA()
-        self.data = q.get_data('2015-05-24', '2019-05-28')
+        self.data = q.get_data(**self.__dict__, collapse='daily',)
         clean_data = self.__clean_data(self.data)
         ma = clean_data.close.rolling(center=False, window=30).mean()
 
         trace = go.Ohlc(x=clean_data.date, open=clean_data.open,
                         close=clean_data.close, high=clean_data.high,
                         low=clean_data.low, name="Currencies")
-        trace1 = go.Scatter(x=clean_data.index, y=ma)
-        trace2 = go.Bar(x=clean_data.index, y=clean_data.volume)
+        trace1 = go.Scatter(x=clean_data.index, y=ma, name="Moving average")
+        trace2 = go.Bar(x=clean_data.index, y=clean_data.volume, name="Volume")
 
         data = [trace, trace1, trace2]
 

@@ -11,6 +11,7 @@ start_date = today - timedelta(days=1)
 
 
 class QUANDLDATA(object):
+    data = []
     currency_pair = "WIKI/FB"
     end_date = today.strftime("%Y-%m-%d")
     start_date = start_date.strftime("%Y-%m-%d")
@@ -18,14 +19,18 @@ class QUANDLDATA(object):
     api_key = os.environ.get("QUANDL_API_KEY")
     return_format = 'data.json'
 
+    def __init__(self, *args, **kwargs):
+        if kwargs.get('currency_pair') is not None:
+            self.currency_pair = kwargs.get('currency_pair')
+
     def date_range(self, start_date, end_date):
         if start_date is not None:
-            self.start_date = start_date
+            self.start_date = start_date.strftime("%Y-%m-%d")
         if end_date is not None:
-            self.end_date = end_date
+            self.end_date = end_date.strftime("%Y-%m-%d")
         return self.start_date, self.end_date
 
-    def get_data(self, start_date=None, end_date=None):
+    def get_data(self, start_date=None, end_date=None, **kwargs):
         """Get sample data
 
         Args:
@@ -37,11 +42,11 @@ class QUANDLDATA(object):
         """
         start, end = self.date_range(start_date, end_date)
         url = self.url_parse(start_date=self.start_date,
-                             end_date=self.end_date)
+                             end_date=self.end_date, **kwargs)
         data = q.get(url, {'API_KEY': self.api_key}).json()
         self.data = data
         self.has_been_called = True
-        return data
+        return self.data
 
     def get_metadata(self):
         assert self.has_been_called == True, "call get data"  # noqa
